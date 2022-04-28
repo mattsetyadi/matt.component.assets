@@ -1,8 +1,8 @@
-import * as React from "react";
+import React from 'react';
 
 type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 
-export type TProps = Omit<React.HTMLProps<HTMLInputElement>, "onChange"> & {
+export type TProps = Omit<React.HTMLProps<HTMLInputElement>, 'onChange'> & {
   mask: string;
   value: string;
   maskSymbol?: any;
@@ -49,33 +49,33 @@ export const MaskedInput: React.FC<TProps> = ({
   onChange,
   ...rest
 }): JSX.Element => {
+  // const hashLength = mask.split('').filter((x: any) => x === '#')?.length;
+  const maxLength = mask?.length;
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.currentTarget;
-    const cleanValue = value.replace(/[^\d]/g, "");
+    const cleanValue = value.replace(/[^\d]/g, '');
     onChange(cleanValue);
   };
 
   function format(value: string, newMask: string): string | undefined {
-    // console.log(
-    //   "newMask",
-    //   newMask.split("").filter((x: any) => x === "#").length
-    // );
-    // const maxLength = newMask.split("").filter((x: any) => x === "#")?.length;
     let i = 0;
     let lastReplacedIndex = -1;
     const filledMask = newMask.replace(/#/g, (_, j) => {
-      // console.log("i", i);
-      if (i >= value.length) {
-        return "#";
+      if (i >= value.length && i <= maxLength) {
+        return '#';
       }
       lastReplacedIndex = j;
       return value[i++];
     });
-    const result = filledMask.substring(0, lastReplacedIndex + 1);
-    // if (result.length <= maxLength)
-    return result;
+
+    return filledMask.substring(0, lastReplacedIndex + 1);
   }
   return (
-    <input value={format(value, mask)} onChange={handleChange} {...rest} />
+    <input
+      value={format(value, mask)}
+      onChange={handleChange}
+      maxLength={maxLength}
+      {...rest}
+    />
   );
 };
